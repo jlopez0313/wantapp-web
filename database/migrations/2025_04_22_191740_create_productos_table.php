@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->string('nombre');
             $table->string('descripcion');
-            $table->integer('precio');
+            $table->decimal('precio', 10, 2);
             $table->tinyInteger('rating');
             $table->string('imagen');
 

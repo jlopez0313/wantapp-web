@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { confirmDialog, showAlert } from '@/plugins/sweetalert';
 import { BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Edit3, Trash2 } from 'lucide-react';
+import { Apple, Edit3, MessagesSquare, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -32,6 +32,14 @@ export default function Index({ auth, lista }: any) {
 
     const onEdit = (id: number) => {
         onGoToForm(id)
+    }
+
+    const onProducts = (id: number) => {
+        router.visit('/productos/' + id)
+    }
+
+    const onComment = (id: number) => {
+        router.visit('/comentarios/' + id)
     }
 
     const onTrash = async (id: number) => {
@@ -102,6 +110,8 @@ export default function Index({ auth, lista }: any) {
                     data={data}
                     titles={['Comercio']}
                     actions={[
+                        { icon: Apple, action: onProducts, title: 'Productos' },
+                        { icon: MessagesSquare, action: onComment, title: 'Comentarios' },
                         { icon: Edit3, action: onEdit, title: 'Editar' },
                         { icon: Trash2, action: onTrash, title: 'Eliminar' },
                     ]}

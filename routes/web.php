@@ -43,7 +43,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/crear', 'create')->name('comercios.create');
             Route::get('/editar/{id}', 'edit')->name('comercios.edit');
         });
+    
+    Route::controller(App\Http\Controllers\ComentariosController::class)
+        ->prefix('comentarios')
+        ->group( function(){
+            Route::get('/{id}', 'index');
+        });
 
+    
+    Route::controller(App\Http\Controllers\ProductosController::class)
+        ->prefix('productos')
+        ->group( function(){
+            Route::get('/{id}', 'index');
+        });
 });
 
 require __DIR__.'/settings.php';

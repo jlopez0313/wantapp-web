@@ -40,7 +40,7 @@ class ComerciosController extends Controller
     {
         \DB::beginTransaction();
 
-        $data = $request->except(['logo', 'banner', 'categorias']);
+        $data = $request->except(['logo', 'banner', 'categorias', 'numero', 'phone', 'country', 'area', 'tipos_dieta']);
 
         if ( $request->logo ) {
             $compressedLogo = $this->imageCompressionService->compressImage($request->logo, "app/files/");
@@ -55,6 +55,13 @@ class ComerciosController extends Controller
         try {
             $comercio = Comercios::create( $data );
             $comercio->categorias()->sync($request->categorias ?? []);
+            $comercio->tipos_dieta()->sync($request->tipos_dieta ?? []);
+
+            $comercio->telefono()->create([
+                'codigo_pais' => $request->country,
+                'codigo_area' => $request->area,
+                'numero' => $request->numero,
+            ]);
 
             \DB::commit();
         } catch(\Exception $ex) {
@@ -72,7 +79,7 @@ class ComerciosController extends Controller
      */
     public function show(Comercios $comercio)
     {
-        $comercio->load('localidad', 'categorias');
+        $comercio->load('telefono', 'localidad', 'categorias', 'tipos_dieta');
         return response()->json([
             'success' => true,
             'message' => 'OK',
@@ -95,7 +102,7 @@ class ComerciosController extends Controller
     {
         \DB::beginTransaction();
 
-        $data = $request->except(['logo', 'banner', 'categorias']);
+        $data = $request->except(['logo', 'banner', 'categorias', 'numero', 'phone', 'country', 'area', 'tipos_dieta']);
 
         if ( $request->logo && $request->logo != $comercio->logo ) {
             \Storage::delete( $comercio->logo );
@@ -112,6 +119,13 @@ class ComerciosController extends Controller
         }
 
         $comercio->categorias()->sync($request->categorias ?? []);
+        $comercio->tipos_dieta()->sync($request->tipos_dieta ?? []);
+
+        $comercio->telefono()->update([
+            'codigo_pais' => $request->country,
+            'codigo_area' => $request->area,
+            'numero' => $request->numero,
+        ]);
 
         try {
             $comercio->update( $data );
@@ -132,5 +146,15 @@ class ComerciosController extends Controller
     public function destroy(Comercios $comercio)
     {
         $comercio->delete();
+    }
+
+
+    public function localidad(string $id)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => 'OK',
+            'data' => Comercios::where('localidades_id', $id)->get(),
+        ]);
     }
 }
