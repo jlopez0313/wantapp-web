@@ -11,9 +11,20 @@ class Productos extends Model
 
     protected $table = 'productos';
     protected $guarded = [];
+    protected $appends = ['rating'];
 
     function categoria() {
         return $this->hasOne(Categorias::class, 'id', 'categorias_id');
+    }
+
+    function comentarios () {
+        return $this->hasMany(Comentarios::class, 'productos_id');
+    }
+
+    public function getRatingAttribute()
+    {
+        $promedio = $this->comentarios()->avg('rating');
+        return $promedio ? (int) round((float)$promedio) : 0;
     }
 
 }

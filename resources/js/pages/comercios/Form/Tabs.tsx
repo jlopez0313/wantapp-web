@@ -21,7 +21,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ({ id }: any) {
 
     const goToComments = () => {
-        router.visit('/comentarios/' + id)
+        router.visit('/comentarios/comercios/' + id)
     }
 
     const goToProductos = () => {

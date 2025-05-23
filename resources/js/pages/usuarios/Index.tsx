@@ -6,41 +6,34 @@ import AppLayout from '@/layouts/app-layout';
 import { confirmDialog, showAlert } from '@/plugins/sweetalert';
 import { BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Edit3, Trash2 } from 'lucide-react';
+import { Building, Edit3, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Form } from './Form';
 
-export default function ({ id, lista }: any) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Comercios',
-            href: '/comercios',
-        },
-        {
-            title: 'Gestionar Comercios',
-            href: '/comercios/editar/' + id,
-        },
-        {
-            title: 'Productos',
-            href: '',
-        },
-    ];
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Usuarios',
+        href: '/usuarios',
+    },
+];
 
+export default function Index({ auth, roles, lista }: any) {
     const currentUrl = usePage().url;
     const { flash }: any = usePage().props;
-    const [productId, setProductId] = useState<number | null>(null);
-    const [show, setShow] = useState(false);
+    const [id, setId] = useState<number | null>(null);
     const [data, setData] = useState([]);
-
-    const onBack = () => {
-        window.history.back();
-    };
+    const [show, setShow] = useState(false);
 
     const onEdit = (id: number) => {
-        setProductId(id);
+        setId(id);
         setShow(true);
     };
-    const onTrash = async (_id: number) => {
+
+    const onComercio = (id: number) => {
+        router.visit(route('comercios.usuario', id))
+    };
+
+    const onTrash = async (id: number) => {
         const result = await confirmDialog({
             title: '¿Estás seguro?',
             text: '¡No podrás revertir esto!',
@@ -48,7 +41,7 @@ export default function ({ id, lista }: any) {
         });
 
         if (result.isConfirmed) {
-            router.delete(route('productos.destroy', _id), {
+            router.delete(route('usuarios.destroy', id), {
                 preserveScroll: true,
                 onSuccess: async () => {
                     await showAlert('success', 'Registro eliminado');
@@ -57,9 +50,9 @@ export default function ({ id, lista }: any) {
                     const remainingItems = lista.data.length - 1;
 
                     if (remainingItems === 0 && currentPage > 1) {
-                        router.visit(`/productos/${id}?page=${currentPage - 1}`);
+                        router.visit(`/usuarios?page=${currentPage - 1}`);
                     } else {
-                        router.visit(`productos/${id}?page=${currentPage}`);
+                        router.visit(`usuarios?page=${currentPage}`);
                     }
                 },
                 onError: () => showAlert('error', 'Error al eliminar'),
@@ -90,11 +83,9 @@ export default function ({ id, lista }: any) {
             const data = lista.data.map((item: any) => {
                 return {
                     id: item.id,
-                    categoria: item.categoria?.nombre || '',
-                    nombre: item.nombre || '',
-                    descripcion: item.descripcion?.length > 50 ? item.descripcion.substring(0, 47) + '...' : item.descripcion,
-                    precio: item.precio || 0,
-                    rating: item.rating || 0,
+                    name: item.name,
+                    email: item.email,
+                    role: item.role,
                 };
             });
             setData(data);
@@ -105,21 +96,19 @@ export default function ({ id, lista }: any) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Productos" />
+            <Head title="Usuarios" />
 
-            <div className="flex w-full items-center justify-end gap-4 px-4 pt-4">
-                <Button variant={'outline'} onClick={onBack}>
-                    {' '}
-                    Regresar{' '}
-                </Button>
+            <div className="flex w-full items-center justify-end px-4 pt-4">
                 <Button onClick={() => setShow(true)}> Agregar </Button>
             </div>
 
             <div className="overflow-x-auto px-4">
                 <Table
+                    user={auth.user}
                     data={data}
-                    titles={['Categoría', 'Producto', 'Descripción', 'Precio', 'Rating']}
+                    titles={['Nombre', 'Email', 'Rol']}
                     actions={[
+                        { icon: Building, action: onComercio, title: 'Mis Comercios' },
                         { icon: Edit3, action: onEdit, title: 'Editar' },
                         { icon: Trash2, action: onTrash, title: 'Eliminar' },
                     ]}
@@ -128,14 +117,14 @@ export default function ({ id, lista }: any) {
 
                 <Pagination links={lista.links} />
 
-                <Modal show={show} closeable={true} title="Gestionar Productos">
+                <Modal show={show} closeable={true} title="Gestionar Usuarios">
                     <Form
                         id={id}
-                        productId={productId}
+                        roles={roles}
                         onReload={onReload}
                         onClose={() => {
                             setShow(false);
-                            setProductId(null);
+                            setId(null);
                         }}
                     />
                 </Modal>

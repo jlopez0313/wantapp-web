@@ -35,14 +35,13 @@ class RedesSocialesController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            RedesSociales::create( $request->all() );
-        } catch(\Exception $ex) {
-            return back()->withErrors([
-                'nombre' => 'Error al guardar',
-                'url' => 'Error al guardar',
-            ]);
-        }
+        $request->validate([
+            'comercios_id' => 'required|number|max:255',
+            'nombre' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+        ]);
+
+        RedesSociales::create( $request->all() );
     }
 
     /**
@@ -70,6 +69,12 @@ class RedesSocialesController extends Controller
      */
     public function update(Request $request, RedesSociales $rede)
     {
+        $request->validate([
+            'comercios_id' => 'required|number|max:255',
+            'nombre' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+        ]);
+
         $rede->update( $request->all() );
     }
 

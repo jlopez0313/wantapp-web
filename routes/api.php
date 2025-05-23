@@ -10,7 +10,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::middleware(['verified'])
+Route::middleware(['web', 'verified'])
 ->prefix('web')
 ->group(function () {
     Route::apiResource('categorias', App\Http\Controllers\Api\CategoriasController::class);
@@ -21,7 +21,10 @@ Route::middleware(['verified'])
     Route::apiResource('productos', App\Http\Controllers\Api\ProductosController::class);
     Route::apiResource('redes', App\Http\Controllers\Api\RedesSocialesController::class);
     Route::apiResource('tipos_dieta', App\Http\Controllers\Api\TiposDietaController::class);
+    Route::apiResource('usuarios', App\Http\Controllers\Api\UsuariosController::class);
 });
+
+
 
 Route::middleware(['auth:sanctum', 'verified'])
 ->group(function () {

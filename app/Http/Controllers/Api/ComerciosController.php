@@ -40,7 +40,18 @@ class ComerciosController extends Controller
     {
         \DB::beginTransaction();
 
-        $data = $request->except(['logo', 'banner', 'categorias', 'numero', 'phone', 'country', 'area', 'tipos_dieta']);
+        $data = $request->except([
+            'logo',
+            'banner',
+            'categorias',
+            'numero',
+            'phone',
+            'country',
+            'area',
+            'tipos_dieta',
+            'estrellas', 
+            'rating_precios'
+        ]);
 
         if ( $request->logo ) {
             $compressedLogo = $this->imageCompressionService->compressImage($request->logo, "app/files/");
@@ -79,7 +90,8 @@ class ComerciosController extends Controller
      */
     public function show(Comercios $comercio)
     {
-        $comercio->load('telefono', 'localidad', 'categorias', 'tipos_dieta');
+        $comercio->load('usuario', 'telefono', 'localidad', 'categorias', 'tipos_dieta');
+
         return response()->json([
             'success' => true,
             'message' => 'OK',
@@ -102,7 +114,18 @@ class ComerciosController extends Controller
     {
         \DB::beginTransaction();
 
-        $data = $request->except(['logo', 'banner', 'categorias', 'numero', 'phone', 'country', 'area', 'tipos_dieta']);
+        $data = $request->except([
+            'logo',
+            'banner',
+            'categorias',
+            'numero',
+            'phone',
+            'country',
+            'area',
+            'tipos_dieta',
+            'estrellas', 
+            'rating_precios'
+        ]);
 
         if ( $request->logo && $request->logo != $comercio->logo ) {
             \Storage::delete( $comercio->logo );

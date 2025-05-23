@@ -43,7 +43,7 @@ class ProductosController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except(['imagen']);
+        $data = $request->except(['rating', 'imagen']);
 
         if ( $request->imagen ) {
             $compressedBanner = $this->imageCompressionService->compressImage($request->imagen, "app/files/");
@@ -85,7 +85,7 @@ class ProductosController extends Controller
      */
     public function update(Request $request, Productos $producto)
     {
-        $data = $request->except(['imagen']);
+        $data = $request->except(['rating', 'imagen']);
 
         if ( $request->imagen && $request->imagen != $producto->imagen ) {
             $compressedBanner = $this->imageCompressionService->compressImage($request->imagen, "app/files/");

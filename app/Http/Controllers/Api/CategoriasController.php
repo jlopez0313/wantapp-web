@@ -35,13 +35,11 @@ class CategoriasController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            Categorias::create( $request->all() );
-        } catch(\Exception $ex) {
-            return back()->withErrors([
-                'nombre' => 'Error al guardar',
-            ]);
-        }
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        Categorias::create( $request->all() );
     }
 
     /**
@@ -69,6 +67,10 @@ class CategoriasController extends Controller
      */
     public function update(Request $request, Categorias $categoria)
     {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
         $categoria->update( $request->all() );
     }
 

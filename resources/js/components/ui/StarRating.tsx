@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import { useState } from 'react';
 
 export default function StarRating({
+    readOnly=false,
     initialRating = 0,
     onRatingChange,
     size = 24,
@@ -42,9 +43,9 @@ export default function StarRating({
                         key={star}
                         type="button"
                         className="p-1 focus:outline-none"
-                        onClick={() => handleClick(star)}
-                        onMouseEnter={() => handleMouseEnter(star)}
-                        onMouseLeave={handleMouseLeave}
+                        onClick={() => readOnly ? null : handleClick(star)}
+                        onMouseEnter={() => readOnly ? null : handleMouseEnter(star)}
+                        onMouseLeave={() => readOnly ? null : handleMouseLeave()}
                         aria-label={`Rate ${star} out of 5`}
                     >
                         <Star

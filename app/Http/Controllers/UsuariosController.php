@@ -4,31 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Productos;
+use App\Models\User;
+use App\Enums\UserRole;
 
-class ProductosController extends Controller
+class UsuariosController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(string $id)
+    public function index()
     {
-        if ( !\Auth::user()
-                ->comercios()
-                ->where('id', $id)
-                ->exists()
-        ) {
-            abort(403, 'Acceso no autorizado'); 
-        }
+        $lista = User::paginate(1);
 
-        $lista = Productos::with('categoria')
-            ->where('comercios_id', $id)
-            ->orderByDesc('created_at')
-            ->paginate(1);
-        
-        return Inertia::render('productos/Index', [
+        return Inertia::render('usuarios/Index', [
             'lista' => $lista,
-            'id' => $id,
+            'roles' => UserRole::cases()
         ]);
     }
 
@@ -51,7 +41,7 @@ class ProductosController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Productos $producto)
+    public function show(string $id)
     {
         //
     }
@@ -59,7 +49,7 @@ class ProductosController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Productos $producto)
+    public function edit(string $id)
     {
         //
     }

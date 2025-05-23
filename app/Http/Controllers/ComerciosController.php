@@ -14,8 +14,10 @@ class ComerciosController extends Controller
      */
     public function index()
     {
-        $lista = Comercios::paginate(1);
-
+        $lista = Comercios::with('usuario')
+            ->forCurrentUser()
+            ->paginate(1);
+        
         return Inertia::render('comercios/Index', [
             'lista' => $lista
         ]);
@@ -69,5 +71,17 @@ class ComerciosController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function usuario(string $id)
+    {
+        $lista = Comercios::with('usuario')
+        ->where('usuarios_id', $id)
+        ->paginate(1);
+
+        return Inertia::render('comercios/Index', [
+            'lista' => $lista,
+            'userId' => $id
+        ]);
     }
 }

@@ -19,6 +19,7 @@ import DraggableMarkerMap from './DraggableMarkerMap';
 
 type ThisForm = {
     nombre: string;
+    usuarios_id: string;
     localidades_id: string;
     tipos_dieta: string[];
     categorias: string[];
@@ -40,6 +41,7 @@ type ThisForm = {
 export const Index = ({ id }: any) => {
     const { data, setData, post, put, processing, errors, reset } = useForm<Required<ThisForm>>({
         nombre: '',
+        usuarios_id: '',
         localidades_id: '',
         tipos_dieta: [],
         categorias: [],
@@ -58,6 +60,7 @@ export const Index = ({ id }: any) => {
         area: '',
     });
 
+    const [usuarios, setUsuarios] = useState([]);
     const [localidades, setLocalidades] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [tiposDieta, setTiposDieta] = useState([]);
@@ -75,12 +78,12 @@ export const Index = ({ id }: any) => {
                     default: { areaCodeLength: 0 },
                 };
 
-                const parsedNumber = parsePhoneNumber(value);                
-                const areaCode = parsedNumber?.nationalNumber.slice(0, countryRules[parsedNumber?.country ?? 'AR']?.areaCodeLength || 0)
+                const parsedNumber = parsePhoneNumber(value);
+                const areaCode = parsedNumber?.nationalNumber.slice(0, countryRules[parsedNumber?.country ?? 'AR']?.areaCodeLength || 0);
 
                 setData('country', parsedNumber?.countryCallingCode);
                 setData('area', areaCode);
-                setData('numero', parsedNumber?.nationalNumber.slice(areaCode?.length ?? 3));   
+                setData('numero', parsedNumber?.nationalNumber.slice(areaCode?.length ?? 3));
             } catch (error) {
                 console.error('Error al parsear el número:', error);
             }
@@ -129,6 +132,8 @@ export const Index = ({ id }: any) => {
             try {
                 const [
                     {
+                        data: { data: usuarios },
+                    },{
                         data: { data: localidades },
                     },
                     {
@@ -138,11 +143,13 @@ export const Index = ({ id }: any) => {
                         data: { data: tipos_dieta },
                     },
                 ]: any = await Promise.all([
+                    axios.get(route('usuarios.index')),
                     axios.get(route('localidades.index')),
                     axios.get(route('categorias.index')),
                     axios.get(route('tipos_dieta.index')),
                 ]);
 
+                setUsuarios(usuarios ?? []);
                 setLocalidades(localidades ?? []);
                 setCategorias(
                     categorias.map((cat: any) => {
@@ -180,6 +187,7 @@ export const Index = ({ id }: any) => {
                     item.tipos_dieta.map((tipo: any) => {
                         return tipo.id;
                     }) || [],
+                usuarios_id: item.usuario?.id.toString() || '',
                 localidades_id: item.localidad?.id.toString() || '',
                 direccion: item.direccion || '',
                 latitud: Number(item.latitud) || 0,
@@ -206,7 +214,7 @@ export const Index = ({ id }: any) => {
         <div className="pt-6 pb-12">
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <form onSubmit={submit}>
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="mt-8 grid grid-cols-2 gap-4">
                         <div className="flex items-center space-x-3">
                             <Checkbox
                                 defaultChecked={data.verificado}
@@ -218,9 +226,38 @@ export const Index = ({ id }: any) => {
 
                             {errors.verificado && <p className="mt-1 text-sm text-red-500">{errors.verificado}</p>}
                         </div>
-                    </div>
 
-                    <div className="mt-8 grid grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="usuarios_id"> Usuario </Label>
+                            <Select
+                                key={`usuarios_id-${resetKey}`}
+                                defaultValue={data.usuarios_id}
+                                onValueChange={(value) => setData('usuarios_id', value)}
+                            >
+                                <SelectTrigger className="flex w-full justify-start rounded-md border border-gray-300 px-3 py-2 text-sm">
+                                    <SelectValue placeholder="Selecciona un Usuario" />
+                                </SelectTrigger>
+                                <SelectContent
+                                    position="popper"
+                                    align="start"
+                                    side="bottom"
+                                    sideOffset={3}
+                                    className="rounded-md border border-gray-300 bg-white p-1 shadow-md"
+                                >
+                                    {usuarios.map((item: any, idx: number) => {
+                                        return (
+                                            <SelectItem key={idx} value={`${item.id}`}>
+                                                {' '}
+                                                {item.name}{' '}
+                                            </SelectItem>
+                                        );
+                                    })}
+                                </SelectContent>
+                            </Select>
+
+                            {errors.usuarios_id && <p className="mt-1 text-sm text-red-500">{errors.usuarios_id}</p>}
+                        </div>
+
                         <div>
                             <Label htmlFor="nombre"> Nombre </Label>
                             <Input
@@ -336,10 +373,10 @@ export const Index = ({ id }: any) => {
 
                             <div className="flex">
                                 <StarRating
+                                    readOnly={true}
                                     key={`stars-${resetKey}`}
                                     resetKey={resetKey}
                                     initialRating={data.estrellas}
-                                    onRatingChange={(e: any) => onDataChange(e, 'estrellas')}
                                 />
                             </div>
                         </div>
@@ -349,10 +386,10 @@ export const Index = ({ id }: any) => {
 
                             <div className="flex">
                                 <StarRating
+                                    readOnly={true}
                                     key={`stars-${resetKey}`}
                                     resetKey={resetKey}
                                     initialRating={data.rating_precios}
-                                    onRatingChange={(e: any) => onDataChange(e, 'rating_precios')}
                                 />
                             </div>
                         </div>

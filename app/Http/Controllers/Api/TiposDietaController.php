@@ -35,13 +35,11 @@ class TiposDietaController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            TiposDietas::create( $request->all() );
-        } catch(\Exception $ex) {
-            return back()->withErrors([
-                'nombre' => 'Error al guardar',
-            ]);
-        }
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        TiposDietas::create( $request->all() );
     }
 
     /**

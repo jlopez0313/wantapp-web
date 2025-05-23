@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('comercios', function (Blueprint $table) {
             $table->id();
 
+            $table->unsignedBigInteger('usuarios_id');
+            $table->foreign('usuarios_id')->references('id')->on('users');
+
             $table->unsignedBigInteger('localidades_id');
             $table->foreign('localidades_id')->references('id')->on('localidades');
 
@@ -25,9 +28,7 @@ return new class extends Migration
             $table->text('direccion');
             $table->decimal('latitud', 20, 15);
             $table->decimal('longitud', 20, 15);
-            $table->tinyInteger('estrellas');
-            $table->integer('rating_precios');
-
+            
             $table->timestamps();
             $table->softDeletes();
         });

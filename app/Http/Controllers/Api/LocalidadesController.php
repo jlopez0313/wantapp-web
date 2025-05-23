@@ -34,14 +34,12 @@ class LocalidadesController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        try {
-            Localidades::create( $request->all() );
-        } catch(\Exception $ex) {
-            return back()->withErrors([
-                'nombre' => 'Error al guardar',
-            ]);
-        }
+    {        
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        Localidades::create( $request->all() );
     }
 
     /**
@@ -69,6 +67,10 @@ class LocalidadesController extends Controller
      */
     public function update(Request $request, Localidades $localidade)
     {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
         $localidade->update( $request->all() );
     }
 

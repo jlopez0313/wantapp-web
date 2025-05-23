@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building, Cookie, Folder, LayoutGrid, MapPin, Tags } from 'lucide-react';
+import { BookOpen, Building, Cookie, Folder, LayoutGrid, MapPin, Tags, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -13,21 +13,30 @@ const mainNavItems: NavItem[] = [
         href: '/dashboard',
         icon: LayoutGrid,
     },{
+        title: 'Usuarios',
+        href: '/usuarios',
+        icon: Users,
+        role: 'admin'
+    },{
         title: 'Categorias',
         href: '/categorias',
         icon: Tags,
+        role: 'admin'
     },{
         title: 'Localidades',
         href: '/localidades',
         icon: MapPin,
+        role: 'admin'
     },{
         title: 'Tipos de Dieta',
         href: '/tipos_dieta',
         icon: Cookie,
+        role: 'admin'
     },{
         title: 'Comercios',
         href: '/comercios',
         icon: Building,
+        role: ['admin', 'comercio']
     },
 ];
 

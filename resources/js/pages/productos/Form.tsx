@@ -173,6 +173,7 @@ export const Form = ({ id, productId, onReload, onClose }: any) => {
 
                             <div className="flex">
                                 <StarRating
+                                    readOnly={true}
                                     key={`stars-${resetKey}`}
                                     resetKey={resetKey}
                                     initialRating={data.rating}

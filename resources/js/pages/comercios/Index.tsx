@@ -1,4 +1,6 @@
+import RoleCheck from '@/auth/RoleBasedAccess';
 import { Button } from '@/components/ui/button';
+import StarRating from '@/components/ui/StarRating';
 import { Pagination } from '@/components/ui/Table/Pagination';
 import { Table } from '@/components/ui/Table/Table';
 import AppLayout from '@/layouts/app-layout';
@@ -15,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Index({ auth, lista }: any) {
+export default function Index({ auth, userId, lista }: any) {
 
     const currentUrl = usePage().url;
     const { flash }: any = usePage().props;
@@ -30,6 +32,10 @@ export default function Index({ auth, lista }: any) {
         }
     }
 
+    const onGoBack = () => {
+        window.history.back();
+    }
+
     const onEdit = (id: number) => {
         onGoToForm(id)
     }
@@ -39,7 +45,7 @@ export default function Index({ auth, lista }: any) {
     }
 
     const onComment = (id: number) => {
-        router.visit('/comentarios/' + id)
+        router.visit('/comentarios/comercios/' + id)
     }
 
     const onTrash = async (id: number) => {
@@ -87,7 +93,10 @@ export default function Index({ auth, lista }: any) {
             const data = lista.data.map((item: any) => {
                 return {
                     id: item.id,
-                    nombre: item.nombre
+                    nombre: item.nombre,
+                    usuario: item.usuario?.name || '',
+                    pts: <StarRating readOnly={true} initialRating={item.estrellas} />,
+                    rating: <StarRating readOnly={true} initialRating={item.rating} />,
                 }
             })
             setData(data)
@@ -99,21 +108,29 @@ export default function Index({ auth, lista }: any) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Comercios" />
-
-            <div className='flex items-center w-full justify-end px-4 pt-4'>
-                <Button onClick={() => onGoToForm()}> Agregar </Button>
-            </div>
+            {
+                userId ?
+                    <div className='flex items-center w-full justify-end px-4 pt-4'>
+                        <Button onClick={() => onGoBack()} variant={'outline'}> Regresar </Button>
+                    </div>
+                :
+                <RoleCheck role='admin'>
+                    <div className='flex items-center w-full justify-end px-4 pt-4'>
+                        <Button onClick={() => onGoToForm()}> Agregar </Button>
+                    </div>
+                </RoleCheck>
+            }
 
             <div className="overflow-x-auto px-4">
                 <Table
                     user={auth.user}
                     data={data}
-                    titles={['Comercio']}
+                    titles={['Comercio', 'Usuario', 'Estrellas', 'Rating Precios']}
                     actions={[
-                        { icon: Apple, action: onProducts, title: 'Productos' },
-                        { icon: MessagesSquare, action: onComment, title: 'Comentarios' },
-                        { icon: Edit3, action: onEdit, title: 'Editar' },
-                        { icon: Trash2, action: onTrash, title: 'Eliminar' },
+                        !userId && { icon: Apple, action: onProducts, title: 'Productos' },
+                        !userId && { icon: MessagesSquare, action: onComment, title: 'Comentarios' },
+                        (!userId && auth.user.role == 'admin') && { icon: Edit3, action: onEdit, title: 'Editar' },
+                        (!userId && auth.user.role == 'admin') && { icon: Trash2, action: onTrash, title: 'Eliminar' },
                     ]}
                     onRow={() => { }}
                 />

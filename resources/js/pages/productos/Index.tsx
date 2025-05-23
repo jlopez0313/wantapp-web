@@ -1,17 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/Components/ui/Modal';
+import StarRating from '@/components/ui/StarRating';
 import { Pagination } from '@/components/ui/Table/Pagination';
 import { Table } from '@/components/ui/Table/Table';
 import AppLayout from '@/layouts/app-layout';
 import { confirmDialog, showAlert } from '@/plugins/sweetalert';
 import { BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { CheckSquare, Edit3, SquareX, Trash2 } from 'lucide-react';
+import { Edit3, MessagesSquare, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Form } from './Form';
 
 export default function ({ id, lista }: any) {
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Comercios',
@@ -22,25 +22,30 @@ export default function ({ id, lista }: any) {
             href: '/comercios/editar/' + id,
         },
         {
-            title: 'Comentarios',
+            title: 'Productos',
             href: '',
         },
     ];
 
     const currentUrl = usePage().url;
     const { flash }: any = usePage().props;
-    const [commentId, setCommentId] = useState<number | null>(null);
+    const [productId, setProductId] = useState<number | null>(null);
     const [show, setShow] = useState(false);
     const [data, setData] = useState([]);
 
     const onBack = () => {
         window.history.back();
-    }
+    };
 
     const onEdit = (id: number) => {
-        setCommentId(id);
+        setProductId(id);
         setShow(true);
     };
+    
+    const onComment = (id: number) => {
+        router.visit('/comentarios/productos/' + id)
+    }
+
     const onTrash = async (_id: number) => {
         const result = await confirmDialog({
             title: '¿Estás seguro?',
@@ -49,7 +54,7 @@ export default function ({ id, lista }: any) {
         });
 
         if (result.isConfirmed) {
-            router.delete(route('comentarios.destroy', _id), {
+            router.delete(route('productos.destroy', _id), {
                 preserveScroll: true,
                 onSuccess: async () => {
                     await showAlert('success', 'Registro eliminado');
@@ -58,9 +63,9 @@ export default function ({ id, lista }: any) {
                     const remainingItems = lista.data.length - 1;
 
                     if (remainingItems === 0 && currentPage > 1) {
-                        router.visit(`/comentarios/${id}?page=${currentPage - 1}`);
+                        router.visit(`/productos/${id}?page=${currentPage - 1}`);
                     } else {
-                        router.visit(`comentarios/${id}?page=${currentPage}`);
+                        router.visit(`productos/${id}?page=${currentPage}`);
                     }
                 },
                 onError: () => showAlert('error', 'Error al eliminar'),
@@ -73,7 +78,6 @@ export default function ({ id, lista }: any) {
             preserveScroll: true,
         });
     };
-    
 
     useEffect(() => {
         if (flash?.success) {
@@ -92,32 +96,37 @@ export default function ({ id, lista }: any) {
             const data = lista.data.map((item: any) => {
                 return {
                     id: item.id,
-                    nombre: item.nombre,
-                    comentario: item.comentario?.length > 50 ? item.comentario.substring(0, 47) + '...' : item.comentario,
-                    fecha: item.fecha,
-                    rating: item.rating,
-                    aprobado: item.aprobado == 1 ? <CheckSquare /> : <SquareX />,
-                }
-            })
-            setData(data)
-        }
+                    categoria: item.categoria?.nombre || '',
+                    nombre: item.nombre || '',
+                    descripcion: item.descripcion?.length > 50 ? item.descripcion.substring(0, 47) + '...' : item.descripcion,
+                    precio: item.precio || 0,
+                    rating: <StarRating readOnly={true} initialRating={item.rating} />,
+                };
+            });
+            setData(data);
+        };
 
         onSetData();
-    }, [])
+    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Comentarios" />
+            <Head title="Productos" />
 
-            <div className="flex w-full items-center justify-end px-4 pt-4">
-                <Button variant={'outline'} onClick={onBack}> Regresar </Button>
+            <div className="flex w-full items-center justify-end gap-4 px-4 pt-4">
+                <Button variant={'outline'} onClick={onBack}>
+                    {' '}
+                    Regresar{' '}
+                </Button>
+                <Button onClick={() => setShow(true)}> Agregar </Button>
             </div>
 
             <div className="overflow-x-auto px-4">
                 <Table
                     data={data}
-                    titles={['Nombre', 'Comentario', 'Fecha', 'Rating', 'Aprobado']}
+                    titles={['Categoría', 'Producto', 'Descripción', 'Precio', 'Rating']}
                     actions={[
+                        { icon: MessagesSquare, action: onComment, title: 'Comentarios' },
                         { icon: Edit3, action: onEdit, title: 'Editar' },
                         { icon: Trash2, action: onTrash, title: 'Eliminar' },
                     ]}
@@ -126,13 +135,14 @@ export default function ({ id, lista }: any) {
 
                 <Pagination links={lista.links} />
 
-                <Modal show={show} closeable={true} title="Gestionar Comentarios">
+                <Modal show={show} closeable={true} title="Gestionar Productos">
                     <Form
-                        id={commentId}
+                        id={id}
+                        productId={productId}
                         onReload={onReload}
                         onClose={() => {
                             setShow(false);
-                            setCommentId(null);
+                            setProductId(null);
                         }}
                     />
                 </Modal>

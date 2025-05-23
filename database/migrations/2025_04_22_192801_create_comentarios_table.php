@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::create('comentarios', function (Blueprint $table) {
             $table->id();
             
-            $table->unsignedBigInteger('comercios_id');
+            $table->unsignedBigInteger('comercios_id')->nullable();
             $table->foreign('comercios_id')->references('id')->on('comercios');
+            
+            $table->unsignedBigInteger('productos_id')->nullable();
+            $table->foreign('productos_id')->references('id')->on('productos');
+
 
             $table->string('nombre');
             $table->text('comentario');

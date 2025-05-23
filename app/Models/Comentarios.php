@@ -15,4 +15,12 @@ class Comentarios extends Model
     function respuesta () {
         return $this->hasOne(Respuestas::class, 'comentarios_id', 'id');
     }
+
+    function producto () {
+        return $this->hasOne(Productos::class, 'id', 'productos_id');
+    }
+
+    function comercio () {
+        return $this->hasOne(Comercios::class, 'id', 'comercios_id');
+    }
 }

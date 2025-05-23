@@ -11,14 +11,37 @@ class ComentariosController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(string $id)
+    public function index(string $id, Request $request)
     {
-        $lista = Comentarios::where('comercios_id', $id)
+        $user = \Auth::user();
+
+        if ($request->type === 'comercios') {
+            if (!$user->comercios()
+                    ->where('id', $id)
+                    ->exists()
+            ){
+                abort(403, 'Acceso no autorizado');
+            }
+        } elseif ($request->type === 'productos') {
+            if (!$user->comercios()
+                    ->whereHas(
+                        'productos',
+                        fn ($q) => $q->where('id', $id)
+                    )->exists()
+            ){
+                abort(403, 'Acceso no autorizado');
+            }
+        } else {
+            abort(400, 'Tipo no válido');
+        }
+
+        $lista = Comentarios::where($request->type . '_id', $id)
             ->orderByDesc('created_at')
             ->paginate(1);
         
-        return Inertia::render('comercios/Comentarios/Index', [
+        return Inertia::render('comentarios/Index', [
             'lista' => $lista,
+            'type' => $request->type,
             'id' => $id,
         ]);
     }

@@ -38,6 +38,7 @@ class ComentariosController extends Controller
     {
         $comentario = Comentarios::create([
             'comercios_id' => $request->comercios_id,
+            'productos_id' => $request->productos_id,
             'nombre' => $request->nombre,
             'comentario' => $request->comentario,
             'fecha' => $request->fecha,
@@ -86,7 +87,6 @@ class ComentariosController extends Controller
                 'comentarios_id' => $comentario->id
             ],
             [
-                'comercios_id' => $comentario->comercios_id,
                 'respuesta' => $request->respuesta
             ],
         );
